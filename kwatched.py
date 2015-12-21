@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
+import argparse
+import os
 import sqlite3
+import sys
 
 
 class SqliteDB(object):
@@ -80,5 +83,23 @@ def find_rewatched_video(previous_list, current_list):
     return update_rows
 
 
+def open_db(filename):
+    if os.path.isfile(filename):
+        db = SqliteDB()
+        db.connect(filename)
+        return db
+    else:
+        print('{} is not a file'.format(filename))
+        sys.exit()
+
+
 if __name__ == '__main__':
-    db = SqliteDB()
+    parser = argparse.ArgumentParser(
+        description=('Migrate previously watched videos to current '
+                     'installation of Kodi media center.'))
+    parser.add_argument('-p', '--previous', help='Filename of previous DB')
+    parser.add_argument('-c', '--current', help='Filename of current DB')
+    args = parser.parse_args()
+
+    prev_db = open_db(args.previous)
+    current_db = open_db(args.current)
